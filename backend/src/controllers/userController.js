@@ -41,12 +41,12 @@ class UserController {
     
     } catch (error) {
 
-        return res.status(500).json({
+        return res.status(400).json({
             error: error.message
         });
 
     }
-    
+
   }
 }
 
