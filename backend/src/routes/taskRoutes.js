@@ -7,5 +7,6 @@ const taskController = require("../controllers/taskController");
 const routes = express.Router();
 
 routes.post("/", authMiddleware, taskController.create);
+routes.get("/project/:projectId", authMiddleware, taskController.listByProject);
 
 module.exports = routes;

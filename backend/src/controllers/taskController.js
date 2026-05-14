@@ -35,6 +35,30 @@ class TaskController {
         
         }
     }
+
+    async listByProject(req, res) {
+
+        try {
+
+            const { projectId } = req.params;
+
+            const userId = req.userId;
+
+            const tasks = await taskService.listByProject({
+                projectId,
+                userId
+            });
+
+            return res.json(tasks);
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
+            
+        }
+    }
 }
 
 module.exports = new TaskController();
