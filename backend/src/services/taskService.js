@@ -86,6 +86,43 @@ class TaskService {
 
         return updatedTask
     }
+
+    async update({ taskId, title, description, priority, userId }) {
+
+        const taskExists =  await prisma.task.findFirst({
+            where: {
+                id: Number(taskId),
+                userId
+            }
+        });
+
+        if (!taskExists) {
+            throw new Error("Tarefa não encontrada.");
+        }
+
+        const allowedPriorities = [
+            "low",
+            "medium",
+            "high"
+        ];
+
+        if (priority && !allowedPriorities.includes(priority)) {
+            throw new Error("Prioridade inválida.");
+        }
+
+        const updatedTask = await prisma.task.update({
+            where: {
+                id: Number(taskId)
+            },
+            data: {
+                title,
+                description,
+                priority
+            }
+        });
+
+        return updatedTask;
+    }
 }
 
 module.exports = new TaskService();

@@ -83,7 +83,36 @@ class TaskController {
             return res.status(400).json({
                 error: error.message
             });
-            
+
+        }
+    }
+
+    async update(req, res) {
+
+        try {
+
+            const { id } = req.params;
+
+            const { title, description, priority } = req.body;
+
+            const userId = req.userId;
+
+            const task = await taskService.update({
+                taskId: id,
+                title,
+                description,
+                priority,
+                userId
+            });
+
+            return res.json(task);
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
+
         }
     }
 }
