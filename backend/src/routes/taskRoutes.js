@@ -10,5 +10,6 @@ routes.post("/", authMiddleware, taskController.create);
 routes.get("/project/:projectId", authMiddleware, taskController.listByProject);
 routes.put("/:id/status", authMiddleware, taskController.updateStatus);
 routes.put("/:id", authMiddleware, taskController.update);
+routes.delete("/:id", authMiddleware, taskController.delete);
 
 module.exports = routes;

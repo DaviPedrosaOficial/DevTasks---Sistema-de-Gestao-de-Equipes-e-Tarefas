@@ -123,6 +123,30 @@ class TaskService {
 
         return updatedTask;
     }
+
+    async delete({ taskId, userId }) {
+
+        const taskExists = await prisma.task.findFirst({
+            where: {
+                id: Number(taskId),
+                userId
+            }
+        });
+
+        if (!taskExists) {
+            throw new Error("Tarefa não encontrada.");
+        }
+
+        await prisma.task.delete({
+            where: {
+                id: Number(taskId)
+            }
+        });
+
+        return {
+            message: "Tarefa deletada com sucesso."
+        };
+    }
 }
 
 module.exports = new TaskService();

@@ -115,6 +115,30 @@ class TaskController {
 
         }
     }
+
+    async delete(req, res) {
+
+        try {
+
+            const { id } = req.params;
+
+            const userId = req.userId;
+
+            const result = await taskService.delete({
+                taskId: id,
+                userId
+            })
+
+            return res.json(result);
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
+        
+        }
+    }
 }
 
 module.exports = new TaskController();
