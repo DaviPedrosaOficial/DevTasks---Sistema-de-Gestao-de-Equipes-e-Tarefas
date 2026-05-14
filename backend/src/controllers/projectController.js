@@ -23,6 +23,27 @@ class ProjectController {
             return res.status(400).json({
                 error: error.message
             });
+
+        }
+    }
+
+    async list(req, res) {
+
+        try {
+
+            const userId = req.userId;
+
+            const projects = await projectService.listByUser(
+                userId
+            );
+
+            return res.json(projects);
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
             
         }
     }
