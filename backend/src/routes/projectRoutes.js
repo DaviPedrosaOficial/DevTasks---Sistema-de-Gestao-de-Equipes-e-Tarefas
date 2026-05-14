@@ -8,5 +8,6 @@ const routes = express.Router();
 
 routes.post("/", authMiddleware, projectController.create);
 routes.get("/", authMiddleware, projectController.list);
+routes.get("/:id", authMiddleware, projectController.getById);
 
 module.exports = routes;

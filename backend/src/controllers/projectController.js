@@ -44,7 +44,31 @@ class ProjectController {
             return res.status(400).json({
                 error: error.message
             });
-            
+
+        }
+    }
+
+    async getById(req, res) {
+
+        try {
+
+            const { id } = req.params;
+
+            const userId = req.userId;
+
+            const project = await projectService.getById({
+                projectId: id,
+                userId
+            });
+
+            return res.json(project);
+        
+        } catch (error) {
+
+            return res.status(404).json({
+                error: error.message
+            });
+        
         }
     }
 }

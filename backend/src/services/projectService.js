@@ -25,6 +25,23 @@ class ProjectService {
         });
 
         return projects;
+
+    }
+
+    async getById({ projectId, userId }){
+
+        const project = await prisma.project.findFirst({
+            where: {
+                id: Number(projectId),
+                userId
+            }
+        });
+
+        if (!project) {
+            throw new Error("Projeto não encontrado.")
+        }
+
+        return project;
     }
 
 }
