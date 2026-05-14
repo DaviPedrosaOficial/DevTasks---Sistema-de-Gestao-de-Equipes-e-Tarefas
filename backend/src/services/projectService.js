@@ -68,9 +68,32 @@ class ProjectService {
         });
 
         return project;
-        
+
     }
 
+    async delete({ projectId, userId }) {
+
+        const projectExists = await prisma.project.findFirst({
+            where: {
+                id: Number(projectId),
+                userId
+            }
+        });
+
+        if(!projectExists) {
+            throw new Error("Projeto não encontrado.");
+        }
+
+        await prisma.project.delete({
+            where: {
+                id: Number(projectId)
+            }
+        });
+
+        return {
+            message: "Projeto deletado com sucesso."
+        };
+    }
 }
 
 module.exports = new ProjectService();
