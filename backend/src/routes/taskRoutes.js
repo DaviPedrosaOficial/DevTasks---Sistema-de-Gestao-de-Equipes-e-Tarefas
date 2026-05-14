@@ -8,5 +8,6 @@ const routes = express.Router();
 
 routes.post("/", authMiddleware, taskController.create);
 routes.get("/project/:projectId", authMiddleware, taskController.listByProject);
+routes.put("/:id/status", authMiddleware, taskController.updateStatus);
 
 module.exports = routes;
