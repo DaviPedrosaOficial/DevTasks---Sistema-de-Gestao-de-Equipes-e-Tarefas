@@ -71,6 +71,34 @@ class ProjectController {
         
         }
     }
+
+    async update(req, res) {
+
+        try {
+
+            const { id } = req.params;
+
+            const { name, description } = req.body;
+
+            const userId = req.userId;
+
+            const project = await projectService.update({
+                projectId: id,
+                name,
+                description,
+                userId
+            });
+
+            return res.json(project);
+
+        } catch (error) {
+
+            return res.status(400).json({
+                error: error.message
+            });
+        
+        }
+    }
 }
 
 module.exports = new ProjectController();

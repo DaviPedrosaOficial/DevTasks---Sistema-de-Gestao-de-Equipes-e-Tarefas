@@ -44,6 +44,33 @@ class ProjectService {
         return project;
     }
 
+    async update({ projectId, name, description, userId }) {
+
+        const projectExists = await prisma.project.findFirst({
+            where: {
+                id: Number(projectId),
+                userId
+            }
+        });
+
+        if(!projectExists) {
+            throw new Error("Projeto não encontrado.");
+        }
+
+        const project = await prisma.project.update({
+           where: {
+            id: Number(projectId)
+           },
+           data: {
+            name,
+            description
+           }
+        });
+
+        return project;
+        
+    }
+
 }
 
 module.exports = new ProjectService();
