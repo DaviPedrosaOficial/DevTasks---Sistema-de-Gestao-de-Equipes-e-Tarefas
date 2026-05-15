@@ -65,6 +65,28 @@ class TaskController {
         }
     }
 
+    async getStats(req, res) {
+
+        try {
+
+            const {projectId} = req.params;
+
+            const userId = req.userId;
+
+            const stats = await taskService.getStats({
+                projectId,
+                userId
+            });
+
+            return res.json(ApiResponse.success(stats));
+
+        } catch (error) {
+
+            return res.status(400).json(ApiResponse.error(error.message));
+        
+        }
+    }
+    
     async updateStatus(req, res) {
 
         try {
@@ -139,27 +161,6 @@ class TaskController {
         }
     }
 
-    async getStats(req, res) {
-
-        try {
-
-            const {projectId} = req.params;
-
-            const userId = req.userId;
-
-            const stats = await taskService.getStats({
-                projectId,
-                userId
-            });
-
-            return res.json(ApiResponse.success(stats));
-
-        } catch (error) {
-
-            return res.status(400).json(ApiResponse.error(error.message));
-        
-        }
-    }
 }
 
 module.exports = new TaskController();
