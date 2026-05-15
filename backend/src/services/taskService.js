@@ -42,7 +42,23 @@ class TaskService {
             throw new Error("Projeto não encontrado.");
         }
 
-        const skip = (Number(page) - 1) * Number(limit);
+        const parsedPage = Number(page);
+
+        const parsedLimit = Number(limit);
+
+        if (isNaN(parsedPage) || parsedPage < 1) {
+            throw new Error("Página inválida. Deve ser um número inteiro maior que 0.");
+        }
+
+        if (isNaN(parsedLimit) || parsedLimit < 1) {
+            throw new Error("Limite inválido. Deve ser um número inteiro maior que 0.");
+        }
+
+        if (parsedLimit > 50) {
+            throw new Error("Limite máximo permitido é 50.");
+        }
+
+        const skip = (parsedPage - 1) * parsedLimit;
 
         const total = await prisma.task.count({
             where: {
@@ -66,7 +82,7 @@ class TaskService {
             }
         });
 
-        const totalPages = Math.ceil(total / Number(limit));
+        const totalPages = Math.ceil(total / Number(parsedLimit));
 
         const allowedOrderBy = [
             "createdAt",
@@ -115,7 +131,7 @@ class TaskService {
 
             skip,
             
-            take: Number(limit)
+            take: Number(parsedLimit)
         });
 
         return {
@@ -123,8 +139,8 @@ class TaskService {
 
             meta: {
                 total,
-                page: Number(page),
-                limit: Number(limit),
+                page: Number(parsedPage),
+                limit: Number(parsedLimit),
                 totalPages
             }
         };
