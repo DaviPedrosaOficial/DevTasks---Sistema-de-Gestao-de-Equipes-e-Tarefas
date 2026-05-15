@@ -44,13 +44,15 @@ class TaskController {
 
             const userId = req.userId;
 
-            const { status, search } = req.query;
+            const { status, search, page = 1, limit = 10 } = req.query;
 
             const tasks = await taskService.listByProject({
                 projectId,
                 userId,
                 status,
-                search
+                search,
+                page,
+                limit
             });
 
             return res.json(tasks);

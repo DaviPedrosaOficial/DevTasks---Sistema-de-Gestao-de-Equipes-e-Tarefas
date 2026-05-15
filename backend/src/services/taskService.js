@@ -29,7 +29,7 @@ class TaskService {
         return task;
     }
 
-    async listByProject({ projectId, userId, status, search }) {
+    async listByProject({ projectId, userId, status, search, page, limit }) {
 
         const projectExists = await prisma.project.findFirst({
             where: {
@@ -41,6 +41,8 @@ class TaskService {
         if (!projectExists) {
             throw new Error("Projeto não encontrado.");
         }
+
+        const skip = (Number(page) - 1) * Number(limit);
 
         const tasks = await prisma.task.findMany({
             where: {
@@ -61,7 +63,9 @@ class TaskService {
                         }
                     ]
                 })
-            }
+            },
+            skip,
+            take: Number(limit)
         });
 
         return tasks;
