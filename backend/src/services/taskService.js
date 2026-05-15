@@ -172,6 +172,58 @@ class TaskService {
             message: "Tarefa deletada com sucesso."
         };
     }
+
+    async getStats({ projectId, userId }) {
+
+        const projectExists = await prisma.project.findFirst({
+            where: {
+                id: Number(projectId),
+                userId
+            }
+        });
+
+        if (!projectExists) {
+            throw new Error("Projeto não encontrado.");
+        }
+
+        const total = await prisma.task.count({
+            where: {
+                projectId: Number(projectId),
+                userId
+            }
+        });
+
+        const pending = await prisma.task.count({
+            where: {
+                projectId: Number(projectId),
+                userId,
+                status: "pending"
+            }
+        });
+
+        const inProgress = await prisma.task.count({
+            where: {
+                projectId: Number(projectId),
+                userId,
+                status: "in_progress"
+            }
+        });
+
+        const done = await prisma.task.count({
+            where: {
+                projectId: Number(projectId),
+                userId,
+                status: "done"
+            }
+        });
+
+        return {
+            total,
+            pending,
+            in_progress: inProgress,
+            done
+        };
+    }
 }
 
 module.exports = new TaskService();
