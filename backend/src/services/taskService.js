@@ -68,6 +68,26 @@ class TaskService {
 
         const totalPages = Math.ceil(total / Number(limit));
 
+        const allowedOrderBy = [
+            "createdAt",
+            "priority",
+            "status",
+            "title"
+        ]
+
+        if (!allowedOrderBy.includes(orderBy)) {
+            throw new Error("Campo orderBy inválido.");
+        }
+
+        const allowedOrder = [
+            "asc",
+            "desc"
+        ]
+
+        if (!allowedOrder.includes(order)) {
+            throw new Error("Tipo de ordenação inválido.");
+        }
+
         const tasks = await prisma.task.findMany({
             where: {
                 projectId: Number(projectId),
