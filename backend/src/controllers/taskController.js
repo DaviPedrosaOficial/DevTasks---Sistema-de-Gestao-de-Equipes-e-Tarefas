@@ -44,7 +44,7 @@ class TaskController {
 
             const userId = req.userId;
 
-            const { status, search, page = 1, limit = 10 } = req.query;
+            const { status, search, page = 1, limit = 10, orderBy = "createdAt", order = "desc" } = req.query;
 
             const tasks = await taskService.listByProject({
                 projectId,
@@ -52,7 +52,9 @@ class TaskController {
                 status,
                 search,
                 page,
-                limit
+                limit,
+                orderBy,
+                order
             });
 
             return res.json(tasks);
