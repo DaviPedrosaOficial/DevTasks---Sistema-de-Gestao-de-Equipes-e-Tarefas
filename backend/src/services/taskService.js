@@ -29,7 +29,7 @@ class TaskService {
         return task;
     }
 
-    async listByProject({ projectId, userId, status }) {
+    async listByProject({ projectId, userId, status, search }) {
 
         const projectExists = await prisma.project.findFirst({
             where: {
@@ -46,7 +46,21 @@ class TaskService {
             where: {
                 projectId: Number(projectId),
                 userId,
-                ...(status && { status })
+                ...(status && { status }),
+                ...(search && {
+                    OR: [
+                        {
+                            title: {
+                                contains: search
+                            }
+                        },
+                        {
+                            description: {
+                                contains: search
+                            }
+                        }
+                    ]
+                })
             }
         });
 
