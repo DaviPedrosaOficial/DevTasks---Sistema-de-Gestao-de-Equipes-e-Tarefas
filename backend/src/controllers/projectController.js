@@ -1,4 +1,5 @@
 const projectService = require("../services/projectService");
+const ApiResponse = require("../utils/apiResponse");
 
 class ProjectController {
 
@@ -16,13 +17,11 @@ class ProjectController {
                 userId
             });
 
-            return res.status(201).json(project);
+            return res.status(201).json(ApiResponse.success(project, "Projeto criado com sucesso."));
 
         } catch (error) {
 
-            return res.status(400).json({
-                error: error.message
-            });
+            return res.status(400).json(ApiResponse.error(error.message));
 
         }
     }
@@ -37,13 +36,11 @@ class ProjectController {
                 userId
             );
 
-            return res.json(projects);
+            return res.json(ApiResponse.success(projects));
 
         } catch (error) {
 
-            return res.status(400).json({
-                error: error.message
-            });
+            return res.status(400).json(ApiResponse.error(error.message));
 
         }
     }
@@ -61,13 +58,11 @@ class ProjectController {
                 userId
             });
 
-            return res.json(project);
+            return res.json(ApiResponse.success(project));
         
         } catch (error) {
 
-            return res.status(404).json({
-                error: error.message
-            });
+            return res.status(404).json(ApiResponse.error(error.message));
         
         }
     }
@@ -89,13 +84,11 @@ class ProjectController {
                 userId
             });
 
-            return res.json(project);
+            return res.json(ApiResponse.success(project, "Projeto atualizado com sucesso."));
 
         } catch (error) {
 
-            return res.status(400).json({
-                error: error.message
-            });
+            return res.status(400).json(ApiResponse.error(error.message));
         
         }
     }
@@ -113,13 +106,11 @@ class ProjectController {
                 userId
             });
 
-            return res.json(result);
+            return res.json(ApiResponse.success(result, "Projeto deletado com sucesso."));
 
         } catch (error) {
 
-            return res.status(400).json({
-                error: error.message
-            });
+            return res.status(400).json(ApiResponse.error(error.message));
             
         }
     }

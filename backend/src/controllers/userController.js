@@ -1,4 +1,5 @@
 const userService = require("../services/userService");
+const ApiResponse = require("../utils/apiResponse");
 
 class UserController {
 
@@ -14,13 +15,11 @@ class UserController {
         password
       });
 
-      return res.status(201).json(user);
+      return res.status(201).json(ApiResponse.success(user, "Usuário registrado com sucesso."));
 
     } catch (error) {
 
-      return res.status(400).json({
-        error: error.message
-      });
+      return res.status(400).json(ApiResponse.error(error.message));
 
     }
 
@@ -37,13 +36,11 @@ class UserController {
             password
         });
 
-        return res.json(result);
+        return res.json(ApiResponse.success(result, "Usuário logado com sucesso."));
     
     } catch (error) {
 
-        return res.status(400).json({
-            error: error.message
-        });
+        return res.status(400).json(ApiResponse.error(error.message));
 
     }
 

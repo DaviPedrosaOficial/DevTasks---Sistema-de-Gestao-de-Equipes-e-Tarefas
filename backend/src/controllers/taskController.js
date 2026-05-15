@@ -1,4 +1,5 @@
 const taskService = require("../services/taskService");
+const ApiResponse = require("../utils/apiResponse");
 
 class TaskController {
 
@@ -25,13 +26,11 @@ class TaskController {
                 userId
             });
 
-            return res.status(201).json(task);
+            return res.status(201).json(ApiResponse.success(task, "Tarefa criada com sucesso."));
         
         } catch (error) {
 
-            return res.status(400).json({
-                error: error.message
-            });
+            return res.status(400).json(ApiResponse.error(error.message));
         
         }
     }
@@ -57,13 +56,11 @@ class TaskController {
                 order
             });
 
-            return res.json(tasks);
+            return res.json(ApiResponse.success(tasks));
 
         } catch (error) {
 
-            return res.status(400).json({
-                error: error.message
-            });
+            return res.status(400).json(ApiResponse.error(error.message));
 
         }
     }
@@ -84,13 +81,11 @@ class TaskController {
                 userId
             });
 
-            return res.json(task);
+            return res.json(ApiResponse.success(task, "Status da tarefa atualizado com sucesso."));
 
         } catch (error) {
 
-            return res.status(400).json({
-                error: error.message
-            });
+            return res.status(400).json(ApiResponse.error(error.message));
 
         }
     }
@@ -113,13 +108,11 @@ class TaskController {
                 userId
             });
 
-            return res.json(task);
+            return res.json(ApiResponse.success(task, "Tarefa atualizada com sucesso."));
 
         } catch (error) {
 
-            return res.status(400).json({
-                error: error.message
-            });
+            return res.status(400).json(ApiResponse.error(error.message));
 
         }
     }
@@ -137,13 +130,11 @@ class TaskController {
                 userId
             })
 
-            return res.json(result);
+            return res.json(ApiResponse.success(result, "Tarefa deletada com sucesso."));
 
         } catch (error) {
 
-            return res.status(400).json({
-                error: error.message
-            });
+            return res.status(400).json(ApiResponse.error(error.message));
         
         }
     }
@@ -161,13 +152,11 @@ class TaskController {
                 userId
             });
 
-            return res.json(stats);
+            return res.json(ApiResponse.success(stats));
 
         } catch (error) {
 
-            return res.status(400).json({
-                error: error.message
-            });
+            return res.status(400).json(ApiResponse.error(error.message));
         
         }
     }
