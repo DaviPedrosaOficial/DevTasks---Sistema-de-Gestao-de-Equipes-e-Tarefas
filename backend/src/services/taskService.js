@@ -44,6 +44,30 @@ class TaskService {
 
         const skip = (Number(page) - 1) * Number(limit);
 
+        const total = await prisma.task.count({
+            where: {
+                projectId: Number(projectId),
+                userId,
+                ...(status && { status }),
+                ...(search && {
+                    OR: [
+                        {
+                            title: {
+                                contains: search
+                            }
+                        },
+                        {
+                            description: {
+                                contains: search
+                            }
+                        }
+                    ]
+                })
+            }
+        });
+
+        const totalPages = Math.ceil(total / Number(limit));
+
         const tasks = await prisma.task.findMany({
             where: {
                 projectId: Number(projectId),
@@ -74,7 +98,16 @@ class TaskService {
             take: Number(limit)
         });
 
-        return tasks;
+        return {
+            data: tasks,
+
+            meta: {
+                total,
+                page: Number(page),
+                limit: Number(limit),
+                totalPages
+            }
+        };
     }
 
     async updateStatus({ taskId, status, userId }) {
