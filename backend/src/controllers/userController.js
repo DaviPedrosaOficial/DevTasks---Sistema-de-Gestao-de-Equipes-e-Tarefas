@@ -1,11 +1,14 @@
 const userService = require("../services/userService");
 const ApiResponse = require("../utils/apiResponse");
+const { registerSchema, loginSchema } = require("../validations/userValidation");
 
 class UserController {
 
-  async register(req, res) {
+  async register(req, res, next) {
 
     try {
+
+      registerSchema.parse(req.body);
 
       const { name, email, password } = req.body;
 
@@ -19,28 +22,30 @@ class UserController {
 
     } catch (error) {
 
-      return res.status(400).json(ApiResponse.error(error.message));
+      next(error);
 
     }
 
   }
 
-  async login(req, res) {
+  async login(req, res, next) {
 
     try {
 
-        const { email, password } = req.body;
+      loginSchema.parse(req.body);
 
-        const result = await userService.login({
-            email,
-            password
-        });
+      const { email, password } = req.body;
 
-        return res.json(ApiResponse.success(result, "Usuário logado com sucesso."));
-    
+      const result = await userService.login({
+          email,
+          password
+      });
+
+      return res.json(ApiResponse.success(result, "Usuário logado com sucesso."));
+  
     } catch (error) {
 
-        return res.status(400).json(ApiResponse.error(error.message));
+      next(error);
 
     }
 

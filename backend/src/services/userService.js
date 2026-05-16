@@ -1,6 +1,7 @@
 const prisma = require("../prisma/prisma");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const AppError = require("../errors/AppError");
 
 class UserService {
   
@@ -13,7 +14,7 @@ class UserService {
     });
 
     if (userAlreadyExists) {
-      throw new Error("Usuário já existe.");
+      throw new AppError("Usuário já existe.", 409);
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -38,7 +39,7 @@ class UserService {
     });
 
     if (!user) {
-      throw new Error("Email ou senha inválidos.");
+      throw new AppError("Email ou senha inválidos.", 401);
     }
 
     const passwordMatch = await bcrypt.compare(
@@ -47,7 +48,7 @@ class UserService {
     );
 
     if (!passwordMatch) {
-      throw new Error("Email ou senha inválidos.");
+      throw new AppError("Email ou senha inválidos.", 401);
     }
 
     const token = jwt.sign(
@@ -59,6 +60,8 @@ class UserService {
         expiresIn: "1d"
       }
     );
+
+    delete user.password;
 
     return {
       user,

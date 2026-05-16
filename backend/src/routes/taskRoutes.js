@@ -76,7 +76,7 @@ routes.get("/project/:projectId", authMiddleware, taskController.listByProject);
  * @swagger
  * /tasks/stats/project/{projectId}:
  *   get:
- *     summary: Obtém estatísticas de tarefas por projeto
+ *     summary: Obtém status das tarefas de um projeto
  *     tags: [Tasks]
  *     security:
  *       - bearerAuth: []
@@ -91,7 +91,7 @@ routes.get("/project/:projectId", authMiddleware, taskController.listByProject);
  *
  *     responses:
  *       200:
- *         description: Estatísticas de tarefas
+ *         description: Status das tarefas
  *
  *         content:
  *           application/json:

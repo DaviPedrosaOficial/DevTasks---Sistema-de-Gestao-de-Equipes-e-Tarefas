@@ -12,12 +12,15 @@ const routes = express.Router();
 *   post:
 *     summary: Registrar um novo usuário
 *     tags: [Users]
+*
 *     requestBody:
 *       required: true
+*
 *       content:
 *         application/json:
 *           schema:
 *             type: object
+*
 *             properties:
 *               name:
 *                 type: string
@@ -25,6 +28,7 @@ const routes = express.Router();
 *                 type: string
 *               password:
 *                 type: string
+*
 *     responses:
 *       201:
 *         description: Usuário criado com sucesso
@@ -33,6 +37,9 @@ const routes = express.Router();
 *           application/json:
 *             schema:
 *               $ref: '#/components/schemas/User'
+*
+*       400:
+*         description: Erro de validação
 */
 routes.post("/register", userController.register);
 
@@ -42,17 +49,21 @@ routes.post("/register", userController.register);
  *   post:
  *     summary: Realiza login de usuário
  *     tags: [Users]
+ * 
  *     requestBody:
  *       required: true
+ * 
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ * 
  *             properties:
  *               email:
  *                 type: string
  *               password:
  *                 type: string
+ * 
  *     responses:
  *       200:
  *         description: Login realizado com sucesso
@@ -61,6 +72,9 @@ routes.post("/register", userController.register);
  *           application/json:
  *             schema:
  *               $ref: '#/components/schemas/LoginResponse'
+ * 
+ *       401:
+ *         description: Credenciais inválidas
  */
 routes.post("/login", userController.login);
 

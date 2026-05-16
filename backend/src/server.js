@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const swaggerUi = require("swagger-ui-express");
 const swaggerSpec = require("./docs/swagger");
+const errorMiddleware = require("./middlewares/errorMiddleware");
 
 const userRoutes = require("./routes/userRoute");
 const projectRoutes = require("./routes/projectRoutes");
@@ -20,6 +21,8 @@ app.use("/projects", projectRoutes);
 app.use("/tasks", taskRoutes);
 
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+
+app.use(errorMiddleware);
 
 app.get("/", (req, res) => {
   res.json({

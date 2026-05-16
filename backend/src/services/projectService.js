@@ -1,4 +1,5 @@
 const prisma = require("../prisma/prisma");
+const AppError = require("../errors/AppError");
 
 class ProjectService {
 
@@ -38,7 +39,7 @@ class ProjectService {
         });
 
         if (!project) {
-            throw new Error("Projeto não encontrado.")
+            throw new AppError("Projeto não encontrado.", 404);
         }
 
         return project;
@@ -54,7 +55,7 @@ class ProjectService {
         });
 
         if(!projectExists) {
-            throw new Error("Projeto não encontrado.");
+            throw new AppError("Projeto não encontrado.", 404);
         }
 
         const project = await prisma.project.update({
@@ -81,7 +82,7 @@ class ProjectService {
         });
 
         if(!projectExists) {
-            throw new Error("Projeto não encontrado.");
+            throw new AppError("Projeto não encontrado.", 404);
         }
 
         await prisma.project.delete({

@@ -1,4 +1,5 @@
 const prisma = require("../prisma/prisma");
+const AppError = require("../errors/AppError");
 
 class TaskService {
 
@@ -12,7 +13,7 @@ class TaskService {
         });
 
         if (!projectExists) {
-            throw new Error("Projeto não encontrado.");
+            throw new AppError("Projeto não encontrado.", 404);
         }
 
         const task = await prisma.task.create({
@@ -39,24 +40,12 @@ class TaskService {
         });
 
         if (!projectExists) {
-            throw new Error("Projeto não encontrado.");
+            throw new AppError("Projeto não encontrado.", 404);
         }
 
         const parsedPage = Number(page);
 
         const parsedLimit = Number(limit);
-
-        if (isNaN(parsedPage) || parsedPage < 1) {
-            throw new Error("Página inválida. Deve ser um número inteiro maior que 0.");
-        }
-
-        if (isNaN(parsedLimit) || parsedLimit < 1) {
-            throw new Error("Limite inválido. Deve ser um número inteiro maior que 0.");
-        }
-
-        if (parsedLimit > 50) {
-            throw new Error("Limite máximo permitido é 50.");
-        }
 
         const skip = (parsedPage - 1) * parsedLimit;
 
@@ -83,26 +72,6 @@ class TaskService {
         });
 
         const totalPages = Math.ceil(total / Number(parsedLimit));
-
-        const allowedOrderBy = [
-            "createdAt",
-            "priority",
-            "status",
-            "title"
-        ]
-
-        if (!allowedOrderBy.includes(orderBy)) {
-            throw new Error("Campo orderBy inválido.");
-        }
-
-        const allowedOrder = [
-            "asc",
-            "desc"
-        ]
-
-        if (!allowedOrder.includes(order)) {
-            throw new Error("Tipo de ordenação inválido.");
-        }
 
         const tasks = await prisma.task.findMany({
             where: {
@@ -156,7 +125,7 @@ class TaskService {
         });
 
         if (!projectExists) {
-            throw new Error("Projeto não encontrado.");
+            throw new AppError("Projeto não encontrado.", 404);
         }
 
         const total = await prisma.task.count({
@@ -208,17 +177,7 @@ class TaskService {
         });
 
         if (!taskExists) {
-            throw new Error("Tarefa não encontrada.");
-        }
-
-        const allowedStatus = [
-            "pending",
-            "in_progress",
-            "done"
-        ];
-
-        if (!allowedStatus.includes(status)) {
-            throw new Error("Status inválido.");
+            throw new AppError("Tarefa não encontrada.", 404);
         }
 
         const updatedTask = await prisma.task.update({
@@ -243,18 +202,9 @@ class TaskService {
         });
 
         if (!taskExists) {
-            throw new Error("Tarefa não encontrada.");
+            throw new AppError("Tarefa não encontrada.", 404);
         }
 
-        const allowedPriorities = [
-            "low",
-            "medium",
-            "high"
-        ];
-
-        if (priority && !allowedPriorities.includes(priority)) {
-            throw new Error("Prioridade inválida.");
-        }
 
         const updatedTask = await prisma.task.update({
             where: {
@@ -280,7 +230,7 @@ class TaskService {
         });
 
         if (!taskExists) {
-            throw new Error("Tarefa não encontrada.");
+            throw new AppError("Tarefa não encontrada.", 404);
         }
 
         await prisma.task.delete({

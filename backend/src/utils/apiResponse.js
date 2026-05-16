@@ -9,11 +9,12 @@ class ApiResponse {
         };
     }
 
-    static error(message = "Erro.") {
+    static error(message, errors = null) {
 
         return {
             success: false,
-            message
+            message,
+            errors
         };
     }
 }

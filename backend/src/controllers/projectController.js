@@ -1,11 +1,14 @@
 const projectService = require("../services/projectService");
 const ApiResponse = require("../utils/apiResponse");
+const { createProjectSchema, getProjectByIdSchema, updateProjectParamsSchema, updateProjectSchema, deleteProjectSchema } = require("../validations/projectValidation");
 
 class ProjectController {
 
-    async create(req, res) {
+    async create(req, res, next) {
 
         try {
+
+            createProjectSchema.parse(req.body);
 
             const { name, description } = req.body;
 
@@ -21,12 +24,11 @@ class ProjectController {
 
         } catch (error) {
 
-            return res.status(400).json(ApiResponse.error(error.message));
-
+            next(error);
         }
     }
 
-    async list(req, res) {
+    async list(req, res, next) {
 
         try {
 
@@ -40,14 +42,15 @@ class ProjectController {
 
         } catch (error) {
 
-            return res.status(400).json(ApiResponse.error(error.message));
-
+            next(error);
         }
     }
 
-    async getById(req, res) {
+    async getById(req, res, next) {
 
         try {
+
+            getProjectByIdSchema.parse(req.params);
 
             const { id } = req.params;
 
@@ -62,15 +65,18 @@ class ProjectController {
         
         } catch (error) {
 
-            return res.status(404).json(ApiResponse.error(error.message));
+            next(error);
         
         }
     }
 
-    async update(req, res) {
+    async update(req, res, next) {
 
         try {
-
+            
+            updateProjectParamsSchema.parse(req.params);
+            updateProjectSchema.parse(req.body);
+            
             const { id } = req.params;
 
             const { name, description } = req.body;
@@ -88,14 +94,16 @@ class ProjectController {
 
         } catch (error) {
 
-            return res.status(400).json(ApiResponse.error(error.message));
+            next(error);
         
         }
     }
 
-    async delete(req, res) {
+    async delete(req, res, next) {
 
         try {
+
+            deleteProjectSchema.parse(req.params);
 
             const { id } = req.params;
 
@@ -110,8 +118,8 @@ class ProjectController {
 
         } catch (error) {
 
-            return res.status(400).json(ApiResponse.error(error.message));
-            
+            next(error);
+
         }
     }
 }

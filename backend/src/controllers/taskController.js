@@ -1,11 +1,14 @@
 const taskService = require("../services/taskService");
 const ApiResponse = require("../utils/apiResponse");
+const { createTaskSchema, listByProjectParamsSchema, listByProjectQuerySchema, getStatsParamsSchema, updateStatusParamsSchema, updateStatusSchema, updateTaskParamsSchema, updateTaskSchema, deleteTaskParamsSchema } = require("../validations/taskValidation");
 
 class TaskController {
 
-    async create(req, res) {
+    async create(req, res, next) {
 
         try {
+
+            createTaskSchema.parse(req.body);
 
             const {
                 title,
@@ -30,14 +33,17 @@ class TaskController {
         
         } catch (error) {
 
-            return res.status(400).json(ApiResponse.error(error.message));
+            next(error);
         
         }
     }
 
-    async listByProject(req, res) {
+    async listByProject(req, res, next) {
 
         try {
+
+            listByProjectParamsSchema.parse(req.params);
+            listByProjectQuerySchema.parse(req.query);
 
             const { projectId } = req.params;
 
@@ -60,14 +66,16 @@ class TaskController {
 
         } catch (error) {
 
-            return res.status(400).json(ApiResponse.error(error.message));
+            next(error);
 
         }
     }
 
-    async getStats(req, res) {
+    async getStats(req, res, next) {
 
         try {
+
+            getStatsParamsSchema.parse(req.params);
 
             const {projectId} = req.params;
 
@@ -82,14 +90,17 @@ class TaskController {
 
         } catch (error) {
 
-            return res.status(400).json(ApiResponse.error(error.message));
+            next(error);
         
         }
     }
     
-    async updateStatus(req, res) {
+    async updateStatus(req, res, next) {
 
         try {
+
+            updateStatusParamsSchema.parse(req.params);
+            updateStatusSchema.parse(req.body);
 
             const { id } = req.params;
 
@@ -107,14 +118,17 @@ class TaskController {
 
         } catch (error) {
 
-            return res.status(400).json(ApiResponse.error(error.message));
+            next(error);
 
         }
     }
 
-    async update(req, res) {
+    async update(req, res, next) {
 
         try {
+
+            updateTaskParamsSchema.parse(req.params);
+            updateTaskSchema.parse(req.body);
 
             const { id } = req.params;
 
@@ -134,14 +148,16 @@ class TaskController {
 
         } catch (error) {
 
-            return res.status(400).json(ApiResponse.error(error.message));
+            next(error);
 
         }
     }
 
-    async delete(req, res) {
+    async delete(req, res, next) {
 
         try {
+
+            deleteTaskParamsSchema.parse(req.params);
 
             const { id } = req.params;
 
@@ -156,7 +172,7 @@ class TaskController {
 
         } catch (error) {
 
-            return res.status(400).json(ApiResponse.error(error.message));
+            next(error);
         
         }
     }
