@@ -1,6 +1,5 @@
 const request = require("supertest");
 const app = require("../src/app");
-const { project } = require("../src/prisma/prisma");
 
 async function createAuthenticatedUser() {
 
@@ -562,7 +561,7 @@ describe("Task Routes", () => {
 
             const response = await request(app)
 
-                .put(`/tasks/${taskId}/status`)
+                .patch(`/tasks/${taskId}/status`)
 
                 .set("Authorization", `Bearer ${token}`)
 
@@ -590,7 +589,7 @@ describe("Task Routes", () => {
 
             const response = await request(app)
 
-                .put(`/tasks/${taskId}/status`);
+                .patch(`/tasks/${taskId}/status`);
 
             expect(response.status).toBe(401);
             expect(response.body.success).toBe(false);
@@ -610,7 +609,7 @@ describe("Task Routes", () => {
 
             const response = await request(app)
 
-                .put(`/tasks/${taskId}/status`)
+                .patch(`/tasks/${taskId}/status`)
 
                 .set("Authorization", "Bearer token_inválido");
 
@@ -632,7 +631,7 @@ describe("Task Routes", () => {
 
             const response = await request(app)
 
-                .put(`/tasks/${taskId}/status`)
+                .patch(`/tasks/${taskId}/status`)
 
                 .set("Authorization", `Bearer ${token}`)
 
@@ -656,7 +655,7 @@ describe("Task Routes", () => {
 
             const response = await request(app)
 
-                .put(`/tasks/${taskId}/status`)
+                .patch(`/tasks/${taskId}/status`)
 
                 .set("Authorization", `Bearer ${anotherUserToken}`)
 
@@ -675,7 +674,7 @@ describe("Task Routes", () => {
 
             const response = await request(app)
 
-                .put("/tasks/9999/status")
+                .patch("/tasks/9999/status")
 
                 .set("Authorization", `Bearer ${token}`)
 
@@ -694,7 +693,7 @@ describe("Task Routes", () => {
 
             const response = await request(app)
 
-                .put("/tasks/invalido/status")
+                .patch("/tasks/invalido/status")
 
                 .set("Authorization", `Bearer ${token}`)
 
@@ -716,7 +715,7 @@ describe("Task Routes", () => {
 
             const response = await request(app)
 
-                .put(`/tasks/${taskId}/status`)
+                .patch(`/tasks/${taskId}/status`)
 
                 .set("Authorization", `Bearer ${token}`)
 

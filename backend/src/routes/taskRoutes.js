@@ -121,7 +121,7 @@ routes.get("/stats/project/:projectId", authMiddleware, taskController.getStats)
 /**
  * @swagger
  * /tasks/{id}/status:
- *   put:
+ *   patch:
  *     summary: Atualiza o status de uma tarefa
  *     tags: [Tasks]
  *     security:
@@ -159,7 +159,7 @@ routes.get("/stats/project/:projectId", authMiddleware, taskController.getStats)
  *       404:
  *         description: Tarefa não encontrada
  */
-routes.put("/:id/status", authMiddleware, taskController.updateStatus);
+routes.patch("/:id/status", authMiddleware, taskController.updateStatus);
 
 /**
  * @swagger
