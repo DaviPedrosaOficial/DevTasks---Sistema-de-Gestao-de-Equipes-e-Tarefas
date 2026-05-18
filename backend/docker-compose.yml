@@ -1,0 +1,41 @@
+services:
+
+  api:
+    build: .
+
+    container_name: taskify-api
+
+    ports:
+      - "3000:3000"
+
+    volumes:
+      - .:/app
+      - /app/node_modules
+
+    environment:
+      DATABASE_URL: "mysql://root:root@mysql:3306/taskify"
+
+    depends_on:
+      - mysql
+
+    command: sh -c "npx wait-on tcp:mysql:3306 && npx prisma migrate deploy && npm run dev"
+
+  mysql:
+    image: mysql:8
+
+    container_name: taskify-mysql
+
+    restart: always
+
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: taskify
+
+    ports:
+      - "3306:3306"
+
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+volumes:
+  mysql_data:

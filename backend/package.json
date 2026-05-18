@@ -25,6 +25,7 @@
     "mysql2": "^3.22.3",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
+    "wait-on": "^9.0.10",
     "zod": "^4.4.3"
   }
 }
