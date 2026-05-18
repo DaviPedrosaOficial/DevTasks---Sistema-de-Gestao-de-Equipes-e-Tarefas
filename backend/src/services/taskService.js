@@ -104,7 +104,7 @@ class TaskService {
         });
 
         return {
-            data: tasks,
+            tasks,
 
             meta: {
                 total,

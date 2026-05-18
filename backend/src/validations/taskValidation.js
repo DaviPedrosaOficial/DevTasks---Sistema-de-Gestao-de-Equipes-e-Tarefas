@@ -71,7 +71,7 @@ const updateTaskParamsSchema = z.object({
 const updateTaskSchema = z.object({
     
     title: z.string().min(2, "O título da tarefa é obrigatório.").optional(),
-    description: z.string().optional(),
+    description: z.string().min(1, "A descrição para ser atualizada não pode estar vazia.").optional(),
     priority: z.enum([
         "low",
         "medium",
