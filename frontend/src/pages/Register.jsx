@@ -1,6 +1,49 @@
 import { Link } from "react-router-dom";
+import { useState, useNavigate } from "react";
+import toast from "react-hot-toast";
+import api from "../services/api";
 
 function Register() {
+
+    const [name, setName] = useState("");
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [confirmPassword, setConfirmPassword] = useState("");
+    const navigate = useNavigate();
+
+    async function handleRegister(event) {
+        event.preventDefault();
+
+        try {
+
+            if (!name || !email || !password || !confirmPassword) {
+                return toast.error("Preencha todos os campos!");
+            }
+
+            if (password.length < 6) {
+                return toast.error("Senha deve conter pelo menos 6 caracteres!");
+            }
+
+            if (password !== confirmPassword) {
+                return toast.error("Senha e confirmação de senha devem ser iguais.");
+            }
+
+            await api.post("/users/register", {
+                name,
+                email,
+                password
+            });
+
+            toast.success("Usuário criado com sucesso!");
+            navigate("/dashboard");
+
+        } catch (error) {
+            console.log(error);
+
+            toast.error("Erro ao criar usuário!");
+        }
+    }
+
     return (
         <div className="min-h-screen bg-zinc-900 flex items-center justify-center px-4">
 
@@ -14,7 +57,10 @@ function Register() {
                     Comece a organizar seus projetos e tarefas.
                 </p>
 
-                <form className="mt-8 space-y-4">
+                <form
+                    className="mt-8 space-y-4"
+                    onSubmit={handleRegister}
+                >
 
                     <div>
                         <label className="text-zinc-300 block mb-2">
@@ -25,6 +71,8 @@ function Register() {
                             type="text"
                             placeholder="Digite seu nome"
                             className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
+                            value={name}
+                            onChange={(e) => setName(e.target.value)}
                         />
                     </div>
 
@@ -37,6 +85,8 @@ function Register() {
                             type="email"
                             placeholder="Digite seu e-mail"
                             className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
 
@@ -49,6 +99,8 @@ function Register() {
                             type="password"
                             placeholder="Digite sua senha"
                             className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
 
@@ -61,6 +113,8 @@ function Register() {
                             type="password"
                             placeholder="Digite sua senha"
                             className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
+                            value={confirmPassword}
+                            onChange={(e) => setConfirmPassword(e.target.value)}
                         />
                     </div>
 
