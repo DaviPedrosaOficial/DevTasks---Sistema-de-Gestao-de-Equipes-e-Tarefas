@@ -1,6 +1,50 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useState, useContext } from 'react';
+
+import toast from 'react-hot-toast';
+
+import api from '../services/api';
+
+import { AuthContext } from "../contexts/AuthContext";
+
+
 
 function Login() {
+
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+
+    const { setToken } = useContext(AuthContext);
+    const navigate = useNavigate();
+
+    async function handleLogin(event) {
+        event.preventDefault();
+
+        if (!email || !password) {
+            return toast.error("Preencha todos os campos!");
+        }
+
+        try {
+            const response = await api.post("/users/login", {
+                email,
+                password
+            });
+
+            const token = response.data.data.token;
+
+            setToken(token);
+
+            toast.success("Usuário logado com sucesso!");
+
+            navigate("/dashboard");
+
+        } catch (error) {
+            console.log(error);
+
+            toast.error("Email ou senha inválidos.");
+        }
+    }
+
     return (
         <div className="min-h-screen bg-zinc-900 flex items-center justify-center px-4">
 
@@ -14,7 +58,10 @@ function Login() {
                     Gerencie suas tarefas de forma simples.
                 </p>
 
-                <form className="mt-8 space-y-4">
+                <form
+                    className="mt-8 space-y-4"
+                    onSubmit={handleLogin}
+                >
 
                     <div>
                         <label className="text-zinc-300 block mb-2">
@@ -25,6 +72,8 @@ function Login() {
                             type="email"
                             placeholder="Digite seu e-mail"
                             className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
                         />
                     </div>
 
@@ -37,6 +86,8 @@ function Login() {
                             type="password"
                             placeholder="Digite sua senha"
                             className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
                         />
                     </div>
 

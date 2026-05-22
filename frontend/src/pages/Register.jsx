@@ -1,6 +1,8 @@
-import { Link } from "react-router-dom";
-import { useState, useNavigate } from "react";
+import { Link, useNavigate } from "react-router-dom";
+import { useState } from "react";
+
 import toast from "react-hot-toast";
+
 import api from "../services/api";
 
 function Register() {
@@ -9,6 +11,7 @@ function Register() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
+
     const navigate = useNavigate();
 
     async function handleRegister(event) {
@@ -35,7 +38,8 @@ function Register() {
             });
 
             toast.success("Usuário criado com sucesso!");
-            navigate("/dashboard");
+
+            navigate("/");
 
         } catch (error) {
             console.log(error);
