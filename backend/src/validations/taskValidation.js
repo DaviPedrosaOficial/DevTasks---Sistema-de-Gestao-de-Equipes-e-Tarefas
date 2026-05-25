@@ -45,6 +45,12 @@ const listByProjectQuerySchema = z.object({
     "done"
   ]).optional(),
 
+  priority: z.enum([
+    "low",
+    "medium",
+    "high"
+  ]).optional(),
+
   search: z.string().optional()
 });
 

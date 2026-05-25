@@ -34,6 +34,8 @@ function Login() {
 
             setToken(token);
 
+            localStorage.setItem("token", token);
+
             toast.success("Usuário logado com sucesso!");
 
             navigate("/dashboard");

@@ -49,12 +49,13 @@ class TaskController {
 
             const userId = req.userId;
 
-            const { status, search, page = 1, limit = 10, orderBy = "createdAt", order = "desc" } = req.query;
+            const { status, priority, search, page = 1, limit = 10, orderBy = "createdAt", order = "desc" } = req.query;
 
             const tasks = await taskService.listByProject({
                 projectId,
                 userId,
                 status,
+                priority,
                 search,
                 page,
                 limit,
