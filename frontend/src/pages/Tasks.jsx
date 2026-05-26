@@ -1,14 +1,12 @@
 import { useCallback, useContext, useEffect, useState, } from "react";
-
+import { DragDropContext, Droppable, Draggable } from '@hello-pangea/dnd';
 import { useParams } from "react-router-dom";
-
 import toast from "react-hot-toast";
 
-import Sidebar from "../components/Sidebar";
-
 import { AuthContext } from "../contexts/AuthContext";
-
 import api from "../services/api";
+import TaskCard from "../components/TaskCard";
+import Sidebar from "../components/Sidebar";
 
 function Tasks() {
 
@@ -23,14 +21,11 @@ function Tasks() {
     const [description, setDescription] = useState("");
     const [priority, setPriority] = useState("medium");
 
-    const [editingTaskId, setEditingTaskId] = useState(null);
-
-    const [editTitle, setEditTitle] = useState("");
-    const [editDescription, setEditDescription] = useState("");
-    const [editPriority, setEditPriority] = useState("medium");
-
     const [statusFilter, setStatusFilter] = useState("");
     const [priorityFilter, setPriorityFilter] = useState("");
+    const [search, setSearch] = useState("");
+
+    const [stats, setStats] = useState(null);
 
     const fetchTasks = useCallback(async () => {
 
@@ -41,6 +36,7 @@ function Tasks() {
                     params: {
                         ...(statusFilter && { status: statusFilter }),
                         ...(priorityFilter && { priority: priorityFilter }),
+                        ...(search && { search }),
                     },
 
                     headers: {
@@ -58,7 +54,7 @@ function Tasks() {
             toast.error(`Erro ao buscar tasks. Erro: ${error}`);
         }
 
-    }, [id, token, statusFilter, priorityFilter]);
+    }, [id, token, statusFilter, priorityFilter, search]);
 
     const fetchProject = useCallback(async () => {
 
@@ -80,6 +76,27 @@ function Tasks() {
 
         }
     }, [id, token]);
+
+    const fetchStats = useCallback(async () => {
+
+        try {
+
+            const response = await api.get(`/tasks/stats/project/${id}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            );
+
+            setStats(response.data.data);
+
+        } catch (error) {
+
+            toast.error(`Erro ao obter os status. Erro: ${error}`);
+
+        }
+    }, [id, token])
 
     async function createTask(event) {
 
@@ -149,33 +166,15 @@ function Tasks() {
         }
     }
 
-    function startEditTask(task) {
-
-        setEditingTaskId(task.id);
-
-        setEditTitle(task.title);
-        setEditDescription(task.description || "");
-        setEditPriority(task.priority);
-    }
-
-    function cancelEdit() {
-
-        setEditingTaskId(null);
-
-        setEditTitle("");
-        setEditDescription("");
-        setEditPriority("medium");
-    }
-
-    async function updateTask(taskId) {
+    async function updateTask(taskId, title, description, priority) {
 
         try {
 
             await api.put(`/tasks/${taskId}`,
                 {
-                    title: editTitle,
-                    description: editDescription,
-                    priority: editPriority,
+                    title,
+                    description,
+                    priority,
                 },
                 {
                     headers: {
@@ -185,8 +184,6 @@ function Tasks() {
             );
 
             fetchTasks();
-
-            cancelEdit();
 
             toast.success("Task atualizada!");
 
@@ -223,70 +220,24 @@ function Tasks() {
         }
     }
 
-    function getStatusColor(status) {
+    async function handleDragEnd(result) {
 
-        switch (status) {
-
-            case "pending":
-                return "bg-yellow-600";
-
-            case "in_progress":
-                return "bg-blue-600";
-
-            case "done":
-                return "bg-green-600";
-
-            default:
-                return "bg-zinc-700";
+        if (!result.destination) {
+            return;
         }
-    }
 
-    function getTaskCardStyle(status) {
+        const taskId = Number(result.draggableId);
 
-        switch (status) {
+        const newStatus = result.destination.droppableId;
 
-            case "pending":
-                return `
-                border-yellow-500
-                bg-yellow-500/5
-            `;
+        try {
 
-            case "in_progress":
-                return `
-                border-blue-500
-                bg-blue-500/5
-                shadow-lg shadow-blue-500/10
-            `;
+            await updateTaskStatus(taskId, newStatus);
 
-            case "done":
-                return `
-                border-green-500
-                bg-green-500/5
-                opacity-70
-            `;
+        } catch (error) {
 
-            default:
-                return `
-                border-zinc-700
-            `;
-        }
-    }
+            toast.error(`Erro ao mover a task. Erro: ${error}`);
 
-    function getPriorityColor(priority) {
-
-        switch (priority) {
-
-            case "low":
-                return "bg-green-600";
-
-            case "medium":
-                return "bg-yellow-600";
-
-            case "high":
-                return "bg-red-600";
-
-            default:
-                return "bg-zinc-600";
         }
     }
 
@@ -295,9 +246,22 @@ function Tasks() {
         if (token) {
             fetchTasks();
             fetchProject();
+            fetchStats();
         }
 
     }, [token, fetchTasks, fetchProject]);
+
+    const pendingTasks = tasks.filter(
+        (task) => task.status === "pending"
+    );
+
+    const inProgressTasks = tasks.filter(
+        (task) => task.status === "in_progress"
+    );
+
+    const doneTasks = tasks.filter(
+        (task) => task.status === "done"
+    );
 
     return (
         <div className="min-h-screen bg-zinc-900 text-white flex">
@@ -317,6 +281,58 @@ function Tasks() {
                     </p>
 
                 </header>
+
+                {/* Status das tasks */}
+                {
+                    stats && (
+
+                        <div className="grid grid-cols-4 gap-3 mt-6">
+
+                            <div className="bg-zinc-800 border border-zinc-700 rounded-xl p-4">
+                                <p className="text-zinc-400 text-sm">
+                                    Total
+                                </p>
+
+                                <h2 className="text-2xl font-bold mt-2">
+                                    {stats.total}
+                                </h2>
+                            </div>
+
+                            <div className="bg-yellow-500/10 border border-yellow-500 rounded-xl p-4">
+                                <p className="text-yellow-400 text-sm">
+                                    Pendentes
+                                </p>
+
+                                <h2 className="text-2xl font-bold mt-2">
+                                    {stats.pending}
+                                </h2>
+                            </div>
+
+                            <div className="bg-blue-500/10 border border-blue-500 rounded-xl p-4">
+                                <p className="text-blue-400 text-sm">
+                                    Em progresso
+                                </p>
+
+                                <h2 className="text-2xl font-bold mt-2">
+                                    {stats.in_progress}
+                                </h2>
+                            </div>
+
+                            <div className="bg-green-500/10 border border-green-500 rounded-xl p-4">
+                                <p className="text-green-400 text-sm">
+                                    Concluídas
+                                </p>
+
+                                <h2 className="text-2xl font-bold mt-2">
+                                    {stats.done}
+                                </h2>
+                            </div>
+
+                        </div>
+                    )
+                }
+
+                {/* Formulário de cadastro de novas Task */}
                 <form
                     onSubmit={createTask}
                     className="mt-10 bg-zinc-800 p-6 rounded-2xl border border-zinc-700"
@@ -326,19 +342,19 @@ function Tasks() {
                         Nova Task
                     </h2>
 
-                    <div className="space-y-4">
+                    <div className="grid grid-cols-12 gap-3">
 
                         <input
                             type="text"
                             placeholder="Título da task"
-                            className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
+                            className="col-span-4 bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
                         />
 
                         <textarea
                             placeholder="Descrição da task"
-                            className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500 resize-none h-32"
+                            className="col-span-8 bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500 resize-none h-[52px]"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                         />
@@ -346,7 +362,7 @@ function Tasks() {
                         <select
                             value={priority}
                             onChange={(e) => setPriority(e.target.value)}
-                            className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
+                            className="col-span-3 bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
                         >
 
                             <option value="low">
@@ -365,7 +381,7 @@ function Tasks() {
 
                         <button
                             type="submit"
-                            className="bg-blue-600 hover:bg-blue-700 transition px-5 py-3 rounded-lg font-semibold cursor-pointer"
+                            className="col-span-2 bg-blue-600 hover:bg-blue-700 transition px-5 py-3 rounded-lg font-semibold cursor-pointer"
                         >
                             Criar Task
                         </button>
@@ -374,7 +390,16 @@ function Tasks() {
 
                 </form>
 
+                {/* Filtros de busca das tasks */}
                 <div className="mt-6 flex gap-4">
+
+                    <input
+                        type="text"
+                        placeholder="Buscar tasks..."
+                        value={search}
+                        onChange={(e) => setSearch(e.target.value)}
+                        className="flex-1 bg-zinc-800 border border-zinc-700 rounded-lg px-4 py-3 text-white outline-none"
+                    />
 
                     <select
                         value={statusFilter}
@@ -426,157 +451,198 @@ function Tasks() {
 
                 </div>
 
+                {/* Sessão das tasks */}
                 <section className="mt-10 grid gap-4">
 
-                    {
-                        tasks.map((task) => (
+                    <DragDropContext onDragEnd={handleDragEnd}>
 
-                            <div
-                                key={task.id}
-                                className={`bg-zinc-800 border rounded-xl p-5 transition-all duration-300 ${getTaskCardStyle(task.status)}`}
-                            >
+                        <div className="grid grid-cols-1 lg:grid-cols-2 2xl:grid-cols-3 gap-6 mt-8">
 
-                                <div className="flex items-start justify-between gap-4">
+                            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
 
-                                    {
-                                        editingTaskId === task.id ? (
+                                <h2 className="text-yellow-400 font-bold text-xl mb-4">
+                                    Pendentes
+                                </h2>
 
-                                            <input
-                                                type="text"
-                                                value={editTitle}
-                                                onChange={(e) => setEditTitle(e.target.value)}
-                                                className="w-full bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-2 text-white outline-none"
-                                            />
+                                <Droppable droppableId="pending">
 
-                                        ) : (
+                                    {(provided, snapshot) => (
 
-                                            <h2 className="text-xl font-semibold">
-                                                {task.title}
-                                            </h2>
-                                        )
-                                    }
+                                        <div
+                                            className={`space-y-4 min-h-[200px] rounded-xl transition p-2 ${snapshot.isDraggingOver ? "bg-zinc-800/60" : ""}`}
+                                            ref={provided.innerRef}
+                                            {...provided.droppableProps}
+                                        >
 
-                                    <div className="flex gap-2 shrink-0">
-
-                                        {
-                                            editingTaskId === task.id ? (
-
-                                                <>
-                                                    <button
-                                                        onClick={() => updateTask(task.id)}
-                                                        className="bg-green-600 hover:bg-green-700 transition px-3 py-2 rounded-lg text-sm cursor-pointer"
+                                            {
+                                                pendingTasks.map((task, index) => (
+                                                    <Draggable
+                                                        key={task.id}
+                                                        draggableId={String(task.id)}
+                                                        index={index}
                                                     >
-                                                        Salvar
-                                                    </button>
 
-                                                    <button
-                                                        onClick={cancelEdit}
-                                                        className="bg-zinc-600 hover:bg-zinc-700 transition px-3 py-2 rounded-lg text-sm cursor-pointer"
-                                                    >
-                                                        Cancelar
-                                                    </button>
-                                                </>
+                                                        {(provided, snapshot) => (
 
-                                            ) : (
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                style={provided.draggableProps.style}
+                                                                className={snapshot.isDragging ? "rotate-1 scale-[1.02]" : ""}
+                                                            >
 
-                                                <>
-                                                    <button
-                                                        onClick={() => startEditTask(task)}
-                                                        className="bg-blue-600 hover:bg-blue-700 transition px-3 py-2 rounded-lg text-sm cursor-pointer"
-                                                    >
-                                                        Editar
-                                                    </button>
+                                                                <TaskCard
+                                                                    task={task}
+                                                                    updateTaskStatus={updateTaskStatus}
+                                                                    updateTask={updateTask}
+                                                                    deleteTask={deleteTask}
+                                                                    isDragging={snapshot.isDragging}
+                                                                />
 
-                                                    <button
-                                                        onClick={() => deleteTask(task.id)}
-                                                        className="bg-red-600 hover:bg-red-700 transition px-3 py-2 rounded-lg text-sm cursor-pointer"
-                                                    >
-                                                        Deletar
-                                                    </button>
-                                                </>
-                                            )
-                                        }
+                                                            </div>
 
-                                    </div>
+                                                        )}
 
-                                </div>
+                                                    </Draggable>
+                                                ))
+                                            }
 
-                                {
-                                    editingTaskId === task.id ? (
+                                            {provided.placeholder}
 
-                                        <textarea
-                                            value={editDescription}
-                                            onChange={(e) => setEditDescription(e.target.value)}
-                                            className="w-full mt-4 bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none resize-none h-28"
-                                        />
+                                        </div>
+                                    )}
 
-                                    ) : (
+                                </Droppable>
 
-                                        <p className="text-zinc-400 mt-2">
-                                            {task.description}
-                                        </p>
-                                    )
-                                }
 
-                                <div className="flex items-center justify-between mt-6">
 
-                                    {
-                                        editingTaskId === task.id ? (
-
-                                            <select
-                                                value={editPriority}
-                                                onChange={(e) => setEditPriority(e.target.value)}
-                                                className="bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-2 text-white outline-none"
-                                            >
-
-                                                <option value="low">
-                                                    Baixa prioridade
-                                                </option>
-
-                                                <option value="medium">
-                                                    Média prioridade
-                                                </option>
-
-                                                <option value="high">
-                                                    Alta prioridade
-                                                </option>
-
-                                            </select>
-
-                                        ) : (
-
-                                            <div className={`px-4 py-2 rounded-full text-sm font-medium text-white ${getPriorityColor(task.priority)}`}>
-
-                                                {task.priority === "low" ? "Baixa prioridade" : task.priority === "medium" ? "Média prioridade" : "Alta prioridade"}
-
-                                            </div>
-                                        )
-                                    }
-
-                                    <select
-                                        value={task.status}
-                                        onChange={(e) => updateTaskStatus(task.id, e.target.value)}
-                                        className={`${getStatusColor(task.status)} border border-zinc-600 rounded-lg px-4 py-2 text-white font-medium min-w-[170px]`}
-                                    >
-
-                                        <option value="pending">
-                                            Pendente
-                                        </option>
-
-                                        <option value="in_progress">
-                                            Em progresso
-                                        </option>
-
-                                        <option value="done">
-                                            Concluída
-                                        </option>
-
-                                    </select>
-
-                                </div>
                             </div>
-                        ))
-                    }
+
+                            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+
+                                <h2 className="text-blue-400 font-bold text-xl mb-4">
+                                    Em progresso
+                                </h2>
+
+                                <Droppable droppableId="in_progress">
+
+                                    {(provided, snapshot) => (
+
+                                        <div
+                                            className={`space-y-4 min-h-[200px] rounded-xl transition p-2 ${snapshot.isDraggingOver ? "bg-zinc-800/60" : ""}`}
+                                            ref={provided.innerRef}
+                                            {...provided.droppableProps}
+                                        >
+
+                                            {
+                                                inProgressTasks.map((task, index) => (
+                                                    <Draggable
+                                                        key={task.id}
+                                                        draggableId={String(task.id)}
+                                                        index={index}
+                                                    >
+
+                                                        {(provided, snapshot) => (
+
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                style={provided.draggableProps.style}
+                                                                className={snapshot.isDragging ? "rotate-1 scale-[1.02]" : ""}
+                                                            >
+
+                                                                <TaskCard
+                                                                    task={task}
+                                                                    updateTaskStatus={updateTaskStatus}
+                                                                    updateTask={updateTask}
+                                                                    deleteTask={deleteTask}
+                                                                    isDragging={snapshot.isDragging}
+                                                                />
+
+                                                            </div>
+                                                        )}
+
+                                                    </Draggable>
+
+                                                ))
+                                            }
+
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+                                </Droppable>
+
+
+
+                            </div>
+
+                            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl p-4">
+
+                                <h2 className="text-green-400 font-bold text-xl mb-4">
+                                    Concluídas
+                                </h2>
+
+                                <Droppable droppableId="done">
+
+                                    {(provided, snapshot) => (
+
+                                        <div
+                                            className={`space-y-4 min-h-[200px] rounded-xl transition p-2 ${snapshot.isDraggingOver ? "bg-zinc-800/60" : ""}`}
+                                            ref={provided.innerRef}
+                                            {...provided.droppableProps}
+                                        >
+
+                                            {
+                                                doneTasks.map((task, index) => (
+                                                    <Draggable
+                                                        key={task.id}
+                                                        draggableId={String(task.id)}
+                                                        index={index}
+                                                    >
+
+                                                        {(provided, snapshot) => (
+
+                                                            <div
+                                                                ref={provided.innerRef}
+                                                                {...provided.draggableProps}
+                                                                {...provided.dragHandleProps}
+                                                                style={provided.draggableProps.style}
+                                                                className={snapshot.isDragging ? "rotate-1 scale-[1.02]" : ""}
+                                                            >
+
+                                                                <TaskCard
+                                                                    task={task}
+                                                                    updateTaskStatus={updateTaskStatus}
+                                                                    updateTask={updateTask}
+                                                                    deleteTask={deleteTask}
+                                                                    isDragging={snapshot.isDragging}
+                                                                />
+
+                                                            </div>
+                                                        )}
+
+                                                    </Draggable>
+
+                                                ))
+                                            }
+
+                                            {provided.placeholder}
+                                        </div>
+                                    )}
+
+                                </Droppable>
+
+
+
+                            </div>
+
+                        </div>
+
+                    </DragDropContext>
+
+
 
                 </section>
 
