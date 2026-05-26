@@ -1,8 +1,10 @@
 import { useState } from "react";
+import TaskModal from "./TaskModal";
 
 function TaskCard({ task, updateTaskStatus, updateTask, deleteTask, isDragging }) {
 
     const [editing, setEditing] = useState(false);
+    const [openModal, setOpenModal] = useState(false);
 
     const [editTitle, setEditTitle] = useState(task.title);
     const [editDescription, setEditDescription] = useState(task.description || "");
@@ -67,7 +69,7 @@ function TaskCard({ task, updateTaskStatus, updateTask, deleteTask, isDragging }
                 return "border-blue-500 bg-blue-500/5 shadow-lg shadow-blue-500/10";
 
             case "done":
-                return "border-green-500 bg-green-500/5 opacity-70";
+                return "border-green-500 bg-green-500/5";
 
             default:
                 return "border-zinc-700";
@@ -78,6 +80,7 @@ function TaskCard({ task, updateTaskStatus, updateTask, deleteTask, isDragging }
 
         <div
             className={`border rounded-2xl p-5 transition-all duration-45 min-w-0 ${getTaskCardStyle(task.status)} ${isDragging ? "shadow-2xl scale-[1.02] rotate-1 z-50" : ""}`}
+            onClick={() => setOpenModal(true)}
         >
 
             <div className="flex items-start justify-between gap-4">
@@ -107,14 +110,20 @@ function TaskCard({ task, updateTaskStatus, updateTask, deleteTask, isDragging }
 
                             <>
                                 <button
-                                    onClick={handleSave}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        handleSave();
+                                    }}
                                     className="bg-green-600 hover:bg-green-700 transition px-3 py-2 rounded-lg text-sm cursor-pointer"
                                 >
                                     Salvar
                                 </button>
 
                                 <button
-                                    onClick={() => setEditing(false)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditing(false);
+                                    }}
                                     className="bg-zinc-600 hover:bg-zinc-700 transition px-3 py-2 rounded-lg text-sm cursor-pointer"
                                 >
                                     Cancelar
@@ -125,14 +134,20 @@ function TaskCard({ task, updateTaskStatus, updateTask, deleteTask, isDragging }
 
                             <>
                                 <button
-                                    onClick={() => setEditing(true)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        setEditing(true);
+                                    }}
                                     className="bg-blue-600 hover:bg-blue-700 transition px-3 py-2 rounded-lg text-sm cursor-pointer"
                                 >
                                     Editar
                                 </button>
 
                                 <button
-                                    onClick={() => deleteTask(task.id)}
+                                    onClick={(e) => {
+                                        e.stopPropagation();
+                                        deleteTask(task.id);
+                                    }}
                                     className="bg-red-600 hover:bg-red-700 transition px-3 py-2 rounded-lg text-sm cursor-pointer"
                                 >
                                     Deletar
@@ -150,7 +165,10 @@ function TaskCard({ task, updateTaskStatus, updateTask, deleteTask, isDragging }
 
                     <textarea
                         value={editDescription}
-                        onChange={(e) => setEditDescription(e.target.value)}
+                        onChange={(e) => {
+                            e.stopPropagation();
+                            setEditDescription(e.target.value);
+                        }}
                         className="w-full mt-4 bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none resize-none h-28"
                     />
 
@@ -169,7 +187,10 @@ function TaskCard({ task, updateTaskStatus, updateTask, deleteTask, isDragging }
 
                         <select
                             value={editPriority}
-                            onChange={(e) => setEditPriority(e.target.value)}
+                            onChange={(e) => {
+                                e.stopPropagation();
+                                setEditPriority(e.target.value);
+                            }}
                             className="bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-2 text-white outline-none"
                         >
 
@@ -205,9 +226,10 @@ function TaskCard({ task, updateTaskStatus, updateTask, deleteTask, isDragging }
 
                 <select
                     value={task.status}
-                    onChange={(e) =>
-                        updateTaskStatus(task.id, e.target.value)
-                    }
+                    onChange={(e) => {
+                        e.stopPropagation();
+                        updateTaskStatus(task.id, e.target.value);
+                    }}
                     className={`${getStatusColor(task.status)} border border-zinc-600 rounded-lg px-4 py-2 text-white font-medium min-w-[170px]`}
                 >
 
@@ -226,6 +248,12 @@ function TaskCard({ task, updateTaskStatus, updateTask, deleteTask, isDragging }
                 </select>
 
             </div>
+
+            <TaskModal
+                task={task}
+                open={openModal}
+                onClose={() => setOpenModal(false)}
+            />
 
         </div>
     );
