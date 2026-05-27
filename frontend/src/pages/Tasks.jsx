@@ -343,19 +343,19 @@ function Tasks() {
                             Nova Task
                         </h2>
 
-                        <div className="grid grid-cols-12 gap-3">
+                        <div className="flex flex-wrap gap-3">
 
                             <input
                                 type="text"
                                 placeholder="Título da task"
-                                className="col-span-4 bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
+                                className="flex-1 min-w-[260px] bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
                             />
 
                             <textarea
                                 placeholder="Descrição da task"
-                                className="col-span-8 bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500 resize-none h-[52px]"
+                                className="flex-[2] min-w-[320px] bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500 resize-none h-[52px]"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
                             />
@@ -363,7 +363,7 @@ function Tasks() {
                             <select
                                 value={priority}
                                 onChange={(e) => setPriority(e.target.value)}
-                                className="col-span-3 bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
+                                className="min-w-[220px] bg-zinc-700 border border-zinc-600 rounded-lg px-4 py-3 text-white outline-none focus:border-blue-500"
                             >
 
                                 <option value="low">
@@ -382,7 +382,7 @@ function Tasks() {
 
                             <button
                                 type="submit"
-                                className="col-span-2 bg-blue-600 hover:bg-blue-700 transition px-5 py-3 rounded-lg font-semibold cursor-pointer"
+                                className="min-w-[160px] bg-blue-600 hover:bg-blue-700 transition px-5 py-3 rounded-lg font-semibold cursor-pointer"
                             >
                                 Criar Task
                             </button>

@@ -72,6 +72,30 @@ routes.post("/", authMiddleware, taskController.create);
  */
 routes.get("/project/:projectId", authMiddleware, taskController.listByProject);
 
+/**
+ * @swagger
+ * /tasks:
+ *   get:
+ *     summary: Lista todas as tarefas do usuário autenticado
+ *     tags: [Tasks]
+ *     security:
+ *       - bearerAuth: []
+ *
+ *     responses:
+ *       200:
+ *         description: Lista de tarefas retornada com sucesso
+ *
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *
+ *               items:
+ *                 $ref: '#/components/schemas/Task'
+ *
+ *       401:
+ *         description: Token inválido ou não fornecido
+ */
 routes.get("/", authMiddleware, taskController.listAll);
 
 /**

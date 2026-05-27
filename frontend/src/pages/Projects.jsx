@@ -1,13 +1,13 @@
 import { useState, useEffect, useContext, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import toast from 'react-hot-toast';
 
 import { AuthContext } from '../contexts/AuthContext';
-
 import api from '../services/api';
 
 import AppLayout from '../components/AppLayout';
+import EditProjectModal from '../components/EditProjectModal';
+import ConfirmModal from '../components/ConfirmModal';
 
 function Projects() {
 
@@ -16,8 +16,13 @@ function Projects() {
     const [name, setName] = useState("");
     const [description, setDescription] = useState("");
 
-    const { token } = useContext(AuthContext);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedProject, setSelectedProject] = useState(null);
 
+    const [isConfirmModalOpen, setIsConfirmModalOpen] = useState(false);
+    const [projectToDelete, setProjectToDelete] = useState(null);
+
+    const { token } = useContext(AuthContext);
     const navigate = useNavigate();
 
     const fetchProjects = useCallback(async () => {
@@ -71,6 +76,74 @@ function Projects() {
 
             toast.error(`Erro ao criar projeto. Erro: ${error}`);
         }
+    }
+
+    function openEditModal(project) {
+
+        setSelectedProject(project);
+        setIsEditModalOpen(true);
+    }
+
+    async function updateProject(updatedProject) {
+
+        try {
+
+            await api.put(`/projects/${updatedProject.id}`,
+                {
+                    name: updatedProject.name,
+                    description:
+                        updatedProject.description
+                },
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            toast.success("Projeto atualizado com sucesso!");
+
+            setIsEditModalOpen(false);
+            setSelectedProject(null);
+
+            fetchProjects();
+
+        } catch (error) {
+
+            toast.error(`Erro ao atualizar projeto. Erro: ${error}`);
+        }
+    }
+
+    async function deleteProject() {
+
+        try {
+
+            await api.delete(`/projects/${projectToDelete}`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`
+                    }
+                }
+            );
+
+            toast.success("Projeto deletado com sucesso!");
+
+            setIsConfirmModalOpen(false);
+            setProjectToDelete(null);
+
+            fetchProjects();
+
+        } catch (error) {
+
+            toast.error(`Erro ao deletar projeto. Erro: ${error}`);
+
+        }
+    }
+
+    function openDeleteModal(projectId) {
+
+        setProjectToDelete(projectId);
+        setIsConfirmModalOpen(true);
     }
 
     useEffect(() => {
@@ -149,17 +222,47 @@ function Projects() {
 
                                     <div
                                         key={project.id}
-                                        className="bg-zinc-800 p-6 rounded-2xl border border-zinc-700"
-                                        onClick={() => navigate(`/projects/${project.id}/tasks`)}
+                                        className="bg-zinc-800 p-6 rounded-2xl border border-zinc-700 hover:border-blue-500 transition flex flex-col justify-between min-h-[220px]"
                                     >
-                                        <h3 className="text-xl font-semibold">
-                                            {project.name}
-                                        </h3>
 
-                                        <p className="text-zinc-400 mt-2">
-                                            {project.description}
-                                        </p>
+                                        <div
+                                            onClick={() => navigate(`/projects/${project.id}/tasks`)}
+                                            className="cursor-pointer flex-1"
+                                        >
+
+                                            <h3 className="text-xl font-semibold">
+
+                                                {project.name}
+
+                                            </h3>
+
+                                            <p className="text-zinc-400 mt-2">
+
+                                                {project.description}
+
+                                            </p>
+
+                                        </div>
+
+                                        <div className="flex gap-3 mt-6">
+
+                                            <button
+                                                onClick={() => openEditModal(project)}
+                                                className="bg-blue-600 hover:bg-blue-700 transition px-4 py-2 rounded-lg font-semibold cursor-pointer"
+                                            >
+                                                Editar
+                                            </button>
+
+                                            <button
+                                                onClick={() => openDeleteModal(project.id)}
+                                                className="bg-red-600 hover:bg-red-700 transition px-4 py-2 rounded-lg font-semibold cursor-pointer"
+                                            >
+                                                Deletar
+                                            </button>
+
+                                        </div>
                                     </div>
+
                                 ))
                             }
 
@@ -170,6 +273,30 @@ function Projects() {
                 </main>
 
             </div>
+
+            <EditProjectModal
+                isOpen={isEditModalOpen}
+                onClose={() => {
+                    setIsEditModalOpen(false);
+                    setSelectedProject(null);
+                }}
+                onSave={updateProject}
+                project={selectedProject}
+            />
+
+            <ConfirmModal
+                isOpen={isConfirmModalOpen}
+                title="Deletar Projeto"
+                message="Tem certeza que deseja deletar este projeto? Essa ação não poderá ser desfeita."
+                confirmText="Deletar"
+                cancelText="Cancelar"
+                onConfirm={deleteProject}
+                onClose={() => {
+                    setIsConfirmModalOpen(false);
+                    setProjectToDelete(null);
+                }}
+            />
+
         </AppLayout>
     );
 }

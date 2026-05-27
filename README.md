@@ -1,8 +1,8 @@
 # DevTasks API 🚀
 
-API RESTful para gerenciamento de tarefas, projetos e usuários, desenvolvida com Node.js, Express, Prisma ORM e MySQL.
+Plataforma Full Stack para gerenciamento de tarefas e projetos, desenvolvida com arquitetura moderna utilizando Node.js, Express, Prisma ORM, React e MySQL.
 
-O projeto foi criado com foco em boas práticas de backend, autenticação JWT, testes automatizados e ambiente totalmente containerizado com Docker.
+O projeto foi criado com foco em boas práticas de desenvolvimento backend/frontend, autenticação JWT, componentização, responsividade, testes automatizados e ambiente totalmente containerizado com Docker.
 
 ---
 
@@ -18,6 +18,16 @@ O projeto foi criado com foco em boas práticas de backend, autenticação JWT, 
 - Testes automatizados com Jest e Supertest
 - Banco de dados MySQL com Prisma ORM
 - Ambiente dockerizado com Docker Compose
+- Dashboard com gráficos
+- Drag and Drop no Kanban
+- Sidebar retrátil
+- Topbar global
+- Perfil de usuário
+- Alteração segura de senha
+- Exclusão de conta
+- Expiração de token JWT
+- Logout automático
+- Interface responsiva
 
 ---
 
@@ -32,21 +42,55 @@ O projeto foi criado com foco em boas práticas de backend, autenticação JWT, 
 - Supertest
 - Docker
 - Docker Compose
+- React
+- React Router DOM
+- TailwindCSS
+- Axios
+- Recharts
 
 ---
 
 ## 📁 Estrutura do projeto
 
 ```bash
-src/
-├── controllers/
-├── services/
-├── routes/
-├── middlewares/
-├── validators/
-├── prisma/
-├── utils/
-└── tests/
+DevTasks/
+├── backend/
+│   ├── prisma/
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── routes/
+│   │   ├── middlewares/
+│   │   ├── validations/
+│   │   ├── utils/
+│   │   └── tests/
+│   │
+│   ├── Dockerfile
+│   └── docker-compose.yml
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── assets/
+│   │   ├── components/
+│   │   ├── contexts/
+│   │   ├── pages/
+│   │   ├── routes/
+│   │   ├── services/
+│   │   └── styles/
+│   │
+│   ├── vite.config.js
+│   └── package.json
+```
+
+---
+
+## 📚 Documentação Swagger
+
+A documentação da API pode ser acessada em:
+
+```bash
+http://localhost:3000/api-docs
 ```
 
 ---
@@ -82,11 +126,25 @@ cd backend
 docker compose up --build
 ```
 
-A API estará disponível em:
+### Em outro terminal, acesse o frontend
 
 ```bash
-http://localhost:3000
+cd frontend
 ```
+
+### Rode o comando
+
+```bash
+npm run dev
+```
+
+Agora a API estará disponível em:
+
+```bash
+http://localhost:5173
+```
+
+Pronta para ser utilizada...
 
 ---
 
@@ -98,10 +156,22 @@ As migrations do Prisma são executadas automaticamente ao iniciar a aplicação
 
 ---
 
-## 🧪 Executando os testes
+## 🧪 Testes automatizados
+
+O projeto possui testes automatizados utilizando Jest e Supertest cobrindo:
+
+- autenticação
+- usuários
+- projetos
+- tarefas
+- permissões
+- validações
+- regras de negócio
+
+Executar testes:
 
 ```bash
-npm test
+docker exec -it taskify-api npm test
 ```
 
 ---
@@ -124,6 +194,10 @@ Authorization: Bearer TOKEN
 
 - POST `/users/register`
 - POST `/users/login`
+- GET `/users/me`
+- PATCH `/users/me`
+- PATCH `/users/me/password`
+- DELETE `/users/me`
 
 ### Projetos
 
@@ -144,15 +218,81 @@ Authorization: Bearer TOKEN
 
 ## 🚀 Melhorias futuras
 
-- Frontend em React
+- Upload de avatar
+- Refresh Token
+- Notificações
+- Tema Dark/Light
 - Deploy em cloud
 - CI/CD
-- Refresh Token
-- Paginação
-- Upload de arquivos
-- Documentação Swagger
+- Recuperação de senha via email
 
 ---
+
+## 📸 Imagens do Projeto
+
+### Login
+
+<p align="center">
+  <img
+    src="./frontend/src/assets/Login.png"
+    width="100%"
+  />
+</p>
+
+---
+
+### Registro
+
+<p align="center">
+  <img
+    src="./frontend/src/assets/Registro.png"
+    width="100%"
+  />
+</p>
+
+---
+
+### Dashboard
+
+<p align="center">
+  <img
+    src="./frontend/src/assets/Dashboard.png"
+    width="100%"
+  />
+</p>
+
+---
+
+### Projetos
+
+<p align="center">
+  <img
+    src="./frontend/src/assets/Projetos.png"
+    width="100%"
+  />
+</p>
+
+---
+
+### Tasks
+
+<p align="center">
+  <img
+    src="./frontend/src/assets/Tasks.png"
+    width="100%"
+  />
+</p>
+
+---
+
+### Perfil
+
+<p align="center">
+  <img
+    src="./frontend/src/assets/Perfil.png"
+    width="100%"
+  />
+</p>
 
 ## 👨‍💻 Autor
 

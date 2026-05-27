@@ -431,6 +431,101 @@ describe("Task Routes", () => {
         });
     });
 
+    describe("List All Tasks", () => {
+
+        it("deve listar todas as tasks do usuário autenticado", async () => {
+
+            const { token, projectId } = await createAuthenticatedProject();
+
+            await request(app)
+
+                .post("/tasks")
+
+                .set("Authorization", `Bearer ${token}`)
+
+                .send({
+                    title: "Task 1",
+                    description: "Primeira task",
+                    projectId
+                });
+
+            await request(app)
+
+                .post("/tasks")
+
+                .set("Authorization", `Bearer ${token}`)
+
+                .send({
+                    title: "Task 2",
+                    description: "Segunda task",
+                    projectId
+                });
+
+            const response = await request(app)
+
+                .get("/tasks")
+
+                .set("Authorization", `Bearer ${token}`);
+
+            expect(response.status).toBe(200);
+            expect(response.body.success).toBe(true);
+            expect(Array.isArray(response.body.data)).toBe(true);
+            expect(response.body.data.length).toBe(2);
+            expect(response.body.data[0]).toHaveProperty("id");
+
+            const titles = response.body.data.map(
+                task => task.title
+            );
+
+            expect(titles).toContain("Task 1");
+            expect(titles).toContain("Task 2");
+        });
+
+        it("deve retornar lista vazia quando o usuário não possuir tasks", async () => {
+
+            const { token } = await createAuthenticatedUser();
+
+            const response = await request(app)
+
+                .get("/tasks")
+
+                .set("Authorization", `Bearer ${token}`);
+
+            expect(response.status).toBe(200);
+            expect(response.body.success).toBe(true);
+            expect(Array.isArray(response.body.data)).toBe(true);
+            expect(response.body.data.length).toBe(0);
+        });
+
+        it("não deve permitir listar tasks sem autenticação", async () => {
+
+            const response = await request(app)
+
+                .get("/tasks");
+
+            expect(response.status).toBe(401);
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toBe("Token de autenticação não fornecido.");
+        });
+
+        it("não deve permitir listar tasks com token inválido", async () => {
+
+            const response = await request(app)
+
+                .get("/tasks")
+
+                .set(
+                    "Authorization",
+                    "Bearer token_inválido"
+                );
+
+            expect(response.status).toBe(401);
+            expect(response.body.success).toBe(false);
+            expect(response.body.message).toBe("Token de autenticação inválido.");
+        });
+
+    });
+
     describe("Get Stats", () => {
 
         it("deve retornar as estatísticas das tasks do projeto", async () => {

@@ -5,6 +5,7 @@ import Register from '../pages/Register';
 import Dashboard from '../pages/Dashboard';
 import Projects from "../pages/Projects";
 import Tasks from "../pages/Tasks";
+import Profile from "../pages/Profile";
 
 import PrivateRoute from "./PrivateRoute";
 
@@ -35,6 +36,14 @@ function AppRoutes() {
                     element={
                         <PrivateRoute>
                             <Projects />
+                        </PrivateRoute>
+                    }
+                />
+                <Route
+                    path="/profile"
+                    element={
+                        <PrivateRoute>
+                            <Profile />
                         </PrivateRoute>
                     }
                 />

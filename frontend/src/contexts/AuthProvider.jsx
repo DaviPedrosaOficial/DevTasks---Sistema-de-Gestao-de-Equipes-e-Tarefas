@@ -1,11 +1,37 @@
 import { AuthContext } from "./AuthContext";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { jwtDecode } from 'jwt-decode'
 
 function AuthProvider({ children }) {
 
     const [token, setToken] = useState(() => {
 
         return localStorage.getItem("token") || "";
+
+    });
+
+    useEffect(() => {
+
+        if (!token) {
+            return;
+        }
+
+        try {
+
+            const decoded = jwtDecode(token);
+
+            const currentTime = Date.now() / 1000;
+
+            if (decoded.exp < currentTime) {
+
+                logout();
+
+            }
+
+        } catch {
+
+            logout();
+        }
 
     });
 

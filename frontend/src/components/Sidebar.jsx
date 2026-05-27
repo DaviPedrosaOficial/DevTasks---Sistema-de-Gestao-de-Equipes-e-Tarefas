@@ -47,6 +47,18 @@ function Sidebar({ collapsed }) {
                     Projetos
                 </NavLink>
 
+                <NavLink
+                    to="/profile"
+                    className={({ isActive }) =>
+                        `flex items-center px-4 py-3 rounded-xl transition font-medium ${isActive
+                            ? "bg-blue-600 text-white"
+                            : "bg-zinc-700 text-zinc-400 hover:bg-zinc-600 hover:text-white"
+                        }`
+                    }
+                >
+                    Perfil
+                </NavLink>
+
             </nav>
 
         </aside>

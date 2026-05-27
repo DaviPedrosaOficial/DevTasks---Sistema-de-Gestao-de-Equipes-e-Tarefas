@@ -69,6 +69,117 @@ class UserService {
     };
 
   }
+
+  async getProfile(userId) {
+
+      const user = await prisma.user.findUnique({
+          where: {
+              id: userId
+          }
+      });
+
+      if (!user) {
+          throw new AppError("Usuário não encontrado.", 404);
+      }
+
+      delete user.password;
+
+      return user;
+  }
+
+  async updateProfile(userId, { name, email }) {
+
+      const user = await prisma.user.findUnique({
+          where: {
+              id: userId
+          }
+      });
+
+      if (!user) {
+          throw new AppError("Usuário não encontrado.", 404);
+      }
+
+      const updatedUser = await prisma.user.update({
+          where: {
+              id: userId
+          },
+          data: {
+              name,
+              email
+          }
+      });
+
+      delete updatedUser.password;
+
+      return updatedUser;
+  }
+
+  async deleteProfile(userId) {
+
+      const user = await prisma.user.findUnique({
+          where: {
+              id: userId
+          }
+      });
+
+      if (!user) {
+          throw new AppError("Usuário não encontrado.", 404);
+      }
+
+      await prisma.user.delete({
+          where: {
+              id: userId
+          }
+      });
+
+      return;
+  }
+
+  async updatePassword(userId,
+    {
+        currentPassword,
+        newPassword
+    }
+  ) {
+
+    const user = await prisma.user.findUnique({
+        where: {
+            id: userId
+        }
+    });
+
+    if (!user) {
+        throw new AppError("Usuário não encontrado.", 404);
+    }
+
+    const passwordMatch = await bcrypt.compare(
+        currentPassword,
+        user.password
+    );
+
+    if (!passwordMatch) {
+        throw new AppError(
+            "Senha atual incorreta.",
+            401
+        );
+    }
+
+    const hashedPassword = await bcrypt.hash(
+        newPassword,
+        10
+    );
+
+    await prisma.user.update({
+        where: {
+            id: userId
+        },
+        data: {
+            password: hashedPassword
+        }
+    });
+
+    return;
+  }
 }
 
 module.exports = new UserService();
