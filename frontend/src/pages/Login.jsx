@@ -14,7 +14,7 @@ function Login() {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
 
-    const { setToken } = useContext(AuthContext);
+    const { login } = useContext(AuthContext);
     const navigate = useNavigate();
 
     async function handleLogin(event) {
@@ -32,7 +32,7 @@ function Login() {
 
             const token = response.data.data.token;
 
-            setToken(token);
+            login(token);
 
             localStorage.setItem("token", token);
 

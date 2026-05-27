@@ -72,6 +72,8 @@ routes.post("/", authMiddleware, taskController.create);
  */
 routes.get("/project/:projectId", authMiddleware, taskController.listByProject);
 
+routes.get("/", authMiddleware, taskController.listAll);
+
 /**
  * @swagger
  * /tasks/stats/project/{projectId}:

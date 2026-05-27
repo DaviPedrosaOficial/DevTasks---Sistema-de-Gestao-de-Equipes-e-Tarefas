@@ -116,6 +116,17 @@ class TaskService {
             }
         };
     }
+
+    async listAll({ userId }) {
+
+        const tasks = await prisma.task.findMany({
+            where: {
+                userId
+            }
+        });
+
+        return tasks;
+    }
     
     async getStats({ projectId, userId }) {
 

@@ -72,6 +72,25 @@ class TaskController {
         }
     }
 
+    async listAll(req, res, next) {
+
+        try {
+
+            const userId = req.userId;
+
+            const tasks = await taskService.listAll({
+                userId
+            });
+
+            return res.json(ApiResponse.success(tasks));
+
+        } catch (error) {
+
+            next(error);
+
+        }
+    }
+
     async getStats(req, res, next) {
 
         try {
